@@ -28,13 +28,13 @@ io.on('connection', function(socket) {
 
 	socket.on('ready', function() {
 		users[socket.username].isReady = true;
+		users[socket.username].giveDice();
 		io.emit('update_player', users);
 		socket.emit('update_current_player', users[socket.username]);
 		if (isAllReady(users) == true) {
-			for (user in users) { users[user].giveDice(); }
 			console.log(users);
 			io.emit('update_player', users);
-			socket.emit('update_current_player', users[socket.username]);
+			io.emit('show_dice_set');
 		}
 	});
 

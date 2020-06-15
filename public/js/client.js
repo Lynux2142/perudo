@@ -37,6 +37,10 @@ socket.on('update_current_player', function(current_player) {
 	`<p>${current_player.diceList}</p>`;
 });
 
+socket.on('show_dice_set', function() {
+	document.getElementById('dice_set').style.display = 'block';
+});
+
 function imReady() {
 	socket.emit('ready');
 	document.getElementById('ready').style.display = "none";
