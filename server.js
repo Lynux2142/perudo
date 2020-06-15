@@ -23,19 +23,24 @@ io.on('connection', function(socket) {
 		socket.username = username;
 		users[socket.username] = new User(socket.username, BEGIN_DICE, [], false);
 		io.emit('update_player', users);
+		socket.emit('update_current_player', users[socket.username]);
 	});
 
 	socket.on('ready', function() {
 		users[socket.username].isReady = true;
 		io.emit('update_player', users);
+		socket.emit('update_current_player', users[socket.username]);
 		if (isAllReady(users) == true) {
 			for (user in users) { users[user].giveDice(); }
 			console.log(users);
+			io.emit('update_player', users);
+			socket.emit('update_current_player', users[socket.username]);
 		}
 	});
 
 	socket.on('disconnect', function() {
 		delete users[socket.username];
+		io.emit('update_player', users);
 		io.emit('message', 'An user has left the game');
 	});
 });

@@ -26,12 +26,18 @@ socket.on('update_player', function(users) {
 				<p>${user}</p>
 			</div>
 			<div class="dice_list">
-				<p>${users[user].isReady ? 'Ready' : 'Not Ready'}</p>
+				<p>${users[user].nbDice}</p>
 			</div>`;
 		document.getElementById('player_list').appendChild(div);
 	}
 });
 
+socket.on('update_current_player', function(current_player) {
+	document.getElementById('dice_set').innerHTML =
+	`<p>${current_player.diceList}</p>`;
+});
+
 function imReady() {
 	socket.emit('ready');
+	document.getElementById('ready').style.display = "none";
 }

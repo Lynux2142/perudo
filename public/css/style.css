@@ -6,13 +6,32 @@
 
 #player_list {
 	background-color: lightgrey;
-	padding: 5px;
+	padding: 1%;
+}
+
+.current_player {
+	background-color: lightblue;
+	width: 98%;
+	position: fixed;
+	bottom: 12%;
+	left: 0;
+	margin: 1%;
+}
+
+.player_set {
+	display: flex;
+	margin: 1%;
+	margin-left: 5%;
+}
+
+#dice_set {
+	margin-left: 10%;
 }
 
 .player {
 	display: flex;
 	background-color: lightblue;
-	margin: 5%;
+	margin: 2%;
 }
 
 .player_name {
@@ -26,16 +45,18 @@
 }
 
 .buttons {
-	background-color: lightblue;
-	width: 100%;
+	background-color: lightgrey;
+	width: 94%;
 	position: fixed;
 	bottom: 0;
 	left: 0;
 	display: inline-block;
 	text-align: center;
-	padding: 5%;
+	margin: 1%;
+	padding: 2%;
 }
 
-.buttons button {
-	font-size: 16px;
+button {
+	font-size: 115%;
+	padding: 1%;
 }
