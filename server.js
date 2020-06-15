@@ -8,6 +8,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
+const IP = require('ip').address();
 const PORT = 4242 || process.env.PORT;
 const BEGIN_DICE = 5;
 
@@ -39,6 +40,6 @@ io.on('connection', function(socket) {
 	});
 });
 
-server.listen(PORT, function() {
-	console.log(`Server is listening on localhost:${PORT}`);
+server.listen(PORT, IP, function() {
+	console.log(`Server is listening on ${IP}:${PORT}`);
 });

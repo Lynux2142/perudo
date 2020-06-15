@@ -26,4 +26,4 @@ function rollDice() {
 	return (Math.floor(Math.random() * Math.floor(6) + 1));
 }
 
-module.exports = { User, isAllReady}
+module.exports = { User, isAllReady }

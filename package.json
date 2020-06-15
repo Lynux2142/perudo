@@ -5,12 +5,13 @@
   "main": "server.js",
   "scripts": {
     "start": "node server",
-	"dev": "nodemon server"
+    "dev": "nodemon server"
   },
   "author": "lguiller",
   "license": "MIT",
   "dependencies": {
     "express": "^4.17.1",
+    "ip": "^1.1.5",
     "moment": "^2.26.0",
     "socket.io": "^2.3.0"
   },
