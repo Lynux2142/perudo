@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<link rel="stylesheet" href="css/style.css" />
+		<title>Perudo Game</title>
+	</head>
+	<body>
+		<div id="player_list">
+			<div class="player">
+				<div class="player_name">
+					<p>username</p>
+				</div>
+				<div class="dice_list">
+					<p>dice</p>
+				</div>
+			</div>
+		</div>
+		<button id="ready" onclick="imReady()">Ready</button>
+		<div class="buttons">
+			<button id="bet">bet</button>
+			<button id="dudo">dudo</button>
+			<button id="palifico">palifico</button>
+		</div>
+	</body>
+	<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"
+		integrity="sha256-Fk/Cwcnq8KA6qN/bhV6C5BpcaSL7rYuzI4EWIH4mvvc="
+		crossorigin="anonymous">
+	</script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="js/client.js"></script>
+</html>

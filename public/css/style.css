@@ -1,0 +1,41 @@
+.window {
+	background-color: lightblue;
+	text-align: center;
+	padding: 0.5%;
+}
+
+#player_list {
+	background-color: lightgrey;
+	padding: 5px;
+}
+
+.player {
+	display: flex;
+	background-color: lightblue;
+	margin: 5%;
+}
+
+.player_name {
+	text-align: center;
+	width: 50%;
+}
+
+.dice_list {
+	text-align: center;
+	width: 50%;
+}
+
+.buttons {
+	background-color: lightblue;
+	width: 100%;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	display: inline-block;
+	text-align: center;
+	padding: 5%;
+}
+
+.buttons button {
+	font-size: 16px;
+}
