@@ -25,7 +25,6 @@
 }
 
 #dice_set {
-	display: none;
 	margin-left: 10%;
 }
 
@@ -45,7 +44,7 @@
 	width: 50%;
 }
 
-.buttons {
+#buttons {
 	background-color: lightgrey;
 	width: 94%;
 	position: fixed;
@@ -55,6 +54,7 @@
 	text-align: center;
 	margin: 1%;
 	padding: 2%;
+	display: none;
 }
 
 button {

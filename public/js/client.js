@@ -19,14 +19,14 @@ socket.on('update_player', function(users) {
 			<p>dice</p>
 		</div>
 	</div>`;
-	for (user in users) {
+	for (id in users) {
 		const div = document.createElement('div');
 		div.classList.add('player');
 		div.innerHTML = `<div class="player_name">
-				<p>${user}</p>
+				<p>${users[id].username}</p>
 			</div>
 			<div class="dice_list">
-				<p>${users[user].nbDice}</p>
+				<p>${users[id].nbDice}</p>
 			</div>`;
 		document.getElementById('player_list').appendChild(div);
 	}
@@ -37,11 +37,27 @@ socket.on('update_current_player', function(current_player) {
 	`<p>${current_player.diceList}</p>`;
 });
 
-socket.on('show_dice_set', function() {
-	document.getElementById('dice_set').style.display = 'block';
+socket.on('game_begin', function() {
+	socket.emit('roll_dice');
+});
+
+socket.on('yourTurn', function() {
+	document.getElementById('buttons').style.display = "block";
 });
 
 function imReady() {
 	socket.emit('ready');
 	document.getElementById('ready').style.display = "none";
+}
+
+function bet() {
+	console.log('bet');
+}
+
+function dudo() {
+	console.log('dudo');
+}
+
+function palifico() {
+	console.log('palifico');
 }

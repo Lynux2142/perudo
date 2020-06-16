@@ -6,6 +6,7 @@ class User {
 		this.isReady = isReady;
 	}
 	giveDice() {
+		this.diceList = [];
 		for (var i = 0; i < this.nbDice; ++i) {
 			this.diceList.push(rollDice());
 		}
@@ -14,7 +15,7 @@ class User {
 
 function isAllReady(users) {
 	for (user in users) {
-		console.log(`${user}: ${users[user].isReady}`)
+		console.log(`${users[user].username}: ${users[user].isReady}`)
 		if (users[user].isReady !== true) {
 			return false;
 		}

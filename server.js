@@ -15,35 +15,50 @@ const BEGIN_DICE = 5;
 app.use(express.static(path.join(__dirname, 'public')));
 
 var users = {};
+var gameInProgress = false;
 
 io.on('connection', function(socket) {
 	console.log('New connection')
 
 	socket.on('add_user', function(username) {
-		socket.username = username;
-		users[socket.username] = new User(socket.username, BEGIN_DICE, [], false);
+		users[socket.id] = new User(username, 0, [], false);
 		io.emit('update_player', users);
-		socket.emit('update_current_player', users[socket.username]);
+		socket.emit('update_current_player', users[socket.id]);
 	});
 
 	socket.on('ready', function() {
-		users[socket.username].isReady = true;
-		users[socket.username].giveDice();
+		users[socket.id].isReady = true;
+		users[socket.id].nbDice = gameInProgress ? 0 : BEGIN_DICE;
 		io.emit('update_player', users);
-		socket.emit('update_current_player', users[socket.username]);
 		if (isAllReady(users) == true) {
-			console.log(users);
-			io.emit('update_player', users);
-			io.emit('show_dice_set');
+			gameInProgress = true;
+			io.emit('game_begin');
+			startGame(users);
 		}
 	});
 
+	socket.on('roll_dice', function() {
+		if (users[socket.id].diceList.length === 0) {
+			users[socket.id].giveDice();
+		}
+		socket.emit('update_current_player', users[socket.id]);
+	});
+
 	socket.on('disconnect', function() {
-		delete users[socket.username];
+		delete users[socket.id];
 		io.emit('update_player', users);
 		io.emit('message', 'An user has left the game');
 	});
 });
+
+function startGame(users) {
+	for (user in users) {
+		io.to(user).emit('yourTurn');
+		break;
+	}
+	//socket.emit('yourTurn');
+	//io.sockets.connected[].emit('yourTurn');
+}
 
 server.listen(PORT, IP, function() {
 	console.log(`Server is listening on ${IP}:${PORT}`);
