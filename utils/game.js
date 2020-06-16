@@ -1,5 +1,6 @@
 class User {
-	constructor(username, nbDice, diceList, isReady) {
+	constructor(id, username, nbDice, diceList, isReady) {
+		this.id = id;
 		this.username = username;
 		this.nbDice = nbDice;
 		this.diceList = diceList;
@@ -15,10 +16,7 @@ class User {
 
 function isAllReady(users) {
 	for (user in users) {
-		console.log(`${users[user].username}: ${users[user].isReady}`)
-		if (users[user].isReady !== true) {
-			return false;
-		}
+		if (users[user].isReady !== true) { return false; }
 	}
 	return true;
 }
@@ -27,4 +25,10 @@ function rollDice() {
 	return (Math.floor(Math.random() * Math.floor(6) + 1));
 }
 
-module.exports = { User, isAllReady }
+function getUser(users, id) {
+	for (var i = 0; i < users.length; ++i)
+		if (users[i].id === id) { return i; }
+	return null;
+}
+
+module.exports = { User, isAllReady, getUser }

@@ -19,14 +19,14 @@ socket.on('update_player', function(users) {
 			<p>dice</p>
 		</div>
 	</div>`;
-	for (id in users) {
+	for (var i = 0; i < users.length; ++i) {
 		const div = document.createElement('div');
 		div.classList.add('player');
 		div.innerHTML = `<div class="player_name">
-				<p>${users[id].username}</p>
+				<p>${users[i].username}</p>
 			</div>
 			<div class="dice_list">
-				<p>${users[id].nbDice}</p>
+				<p>${users[i].nbDice}</p>
 			</div>`;
 		document.getElementById('player_list').appendChild(div);
 	}
