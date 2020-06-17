@@ -13,20 +13,20 @@
 			<main>
 				<form action="game.html">
 					<div>
-						<label for="username">Username</label>
+						<label for="Username">Username (only letters and digits allowed): </label>
 						<input
 							type="text"
 							name="username"
 							id="username"
+							pattern="[A-Za-z0-9]*"
 							placeholder="Enter username..."
 							required
 						/>
 					</div>
 					<div>
-						<label for="room">Room</label>
+						<label for="room">Room: </label>
 						<select name"room" id="room">
 							<option value="Default">Default</option>
-							<option value="Test">Test</option>
 						</select>
 					</div>
 				</form>

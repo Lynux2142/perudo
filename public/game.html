@@ -17,6 +17,18 @@
 		</div>
 		<button id="ready" onclick="imReady()">Ready</button>
 		<div id="buttons">
+			<label>Amount: </label>
+			<input type="number" id="diceAmount" min="1" max="20" value="1">
+			<label>Value: </label>
+			<select id="diceValue">
+				<script>
+					var value = '';
+					for (var i = 1; i <= 6; ++i) {
+						value += "<option value=" + i + ">" + ((i === 1) ? "PACO" : i) + "</option>";
+					}
+					document.getElementById('diceValue').innerHTML = value;
+				</script>
+			</select>
 			<button id="bet" onclick="bet()">bet</button>
 			<button id="dudo" onclick="dudo()">dudo</button>
 			<button id="palifico" onclick="palifico()">palifico</button>

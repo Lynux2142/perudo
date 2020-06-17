@@ -13,10 +13,10 @@ socket.on('update_player', function(users) {
 	document.getElementById('player_list').innerHTML =
 	`<div class="player">
 		<div class="player_name">
-			<p>username</p>
+			<p>Username</p>
 		</div>
 		<div class="dice_list">
-			<p>dice</p>
+			<p>Dice</p>
 		</div>
 	</div>`;
 	for (var i = 0; i < users.length; ++i) {
@@ -37,12 +37,20 @@ socket.on('update_current_player', function(current_player) {
 	`<p>${current_player.diceList}</p>`;
 });
 
-socket.on('game_begin', function() {
+socket.on('new_round_begin', function() {
 	socket.emit('roll_dice');
 });
 
 socket.on('yourTurn', function() {
 	document.getElementById('buttons').style.display = "block";
+});
+
+socket.on('hide_controls', function() {
+	document.getElementById('buttons').style.display = 'none';
+});
+
+socket.on('message', function(message) {
+	window.alert(message);
 });
 
 function imReady() {
@@ -51,11 +59,13 @@ function imReady() {
 }
 
 function bet() {
-	console.log('bet');
+	const dice_amount = document.getElementById('diceAmount').value;
+	const dice_value = document.getElementById('diceValue').value;
+	socket.emit('bet', dice_amount, dice_value);
 }
 
 function dudo() {
-	console.log('dudo');
+	socket.emit('dudo');
 }
 
 function palifico() {

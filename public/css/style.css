@@ -57,6 +57,10 @@
 	display: none;
 }
 
+#diceAmount {
+	width: 25px;
+}
+
 button {
 	font-size: 115%;
 	padding: 1%;
