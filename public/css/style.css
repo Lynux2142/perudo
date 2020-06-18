@@ -1,3 +1,7 @@
+* {
+	font-size: 98%;
+}
+
 .window {
 	background-color: lightblue;
 	text-align: center;
@@ -7,6 +11,7 @@
 #player_list {
 	background-color: lightgrey;
 	padding: 1%;
+	padding-top: 0;
 }
 
 .current_player {
@@ -28,10 +33,15 @@
 	margin-left: 10%;
 }
 
+.player_list_title {
+	display: flex;
+	margin: 1%;
+}
+
 .player {
 	display: flex;
 	background-color: lightblue;
-	margin: 2%;
+	margin: 1%;
 }
 
 .player_name {
@@ -42,6 +52,11 @@
 .dice_list {
 	text-align: center;
 	width: 50%;
+}
+
+#game_message {
+	width: 100%;
+	text-align: center;
 }
 
 #buttons {

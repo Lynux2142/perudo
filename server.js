@@ -27,7 +27,6 @@ io.on('connection', function(socket) {
 	socket.on('add_user', function(username) {
 		users.push(new User(socket.id, username, 0, [], false));
 		io.emit('update_player', users);
-		socket.emit('update_current_player', users[getUser(users, socket.id)]);
 	});
 
 	socket.on('ready', function() {
@@ -42,9 +41,8 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('roll_dice', function() {
-		if (users[getUser(users, socket.id)].diceList.length === 0) {
+		if (users[getUser(users, socket.id)].nbDice !== 0) {
 			users[getUser(users, socket.id)].giveDice();
-			console.log(users[getUser(users, socket.id)].diceList);
 		}
 		socket.emit('update_current_player', users[getUser(users, socket.id)]);
 	});
@@ -74,8 +72,8 @@ io.on('connection', function(socket) {
 			}
 		}
 		if (actualDiceAmount <= realDiceAmount) {
-			//socket.emit('message', 'You lost');
-			//socket.broadcast.emit('message', users[playerTurn].username + ' lost');
+			socket.emit('message', 'You lost');
+			socket.broadcast.emit('message', users[playerTurn].username + ' lost');
 			--users[playerTurn].nbDice;
 		} else {
 			--users[previousPlayerTurn].nbDice;
@@ -83,9 +81,7 @@ io.on('connection', function(socket) {
 		io.emit('update_player', users);
 		nextPlayerTurn();
 		socket.emit('hide_controls');
-		// CETTE APPEL NE FONCTIONNNE PAS !!
 		io.emit('new_round_begin');
-		// WHY ?!
 		nextRound();
 	});
 

@@ -11,7 +11,7 @@ socket.on('connect', function() {
 
 socket.on('update_player', function(users) {
 	document.getElementById('player_list').innerHTML =
-	`<div class="player">
+	`<div class="player_list_title">
 		<div class="player_name">
 			<p>Username</p>
 		</div>
@@ -50,7 +50,7 @@ socket.on('hide_controls', function() {
 });
 
 socket.on('message', function(message) {
-	window.alert(message);
+	document.getElementById('game_message').innerHTML = "<p>" + message + "</p>";
 });
 
 function imReady() {
