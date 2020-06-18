@@ -61,19 +61,19 @@
 
 #buttons {
 	background-color: lightgrey;
-	width: 94%;
+	width: 96%;
 	position: fixed;
 	bottom: 0;
 	left: 0;
 	display: inline-block;
 	text-align: center;
 	margin: 1%;
-	padding: 2%;
+	padding: 1%;
 	display: none;
 }
 
 #diceAmount {
-	width: 25px;
+	width: 50px;
 }
 
 button {
