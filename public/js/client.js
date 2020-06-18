@@ -53,6 +53,10 @@ socket.on('message', function(message) {
 	document.getElementById('game_message').innerHTML = '<p>' + message + '</p>';
 });
 
+socket.on('add_message', function(message) {
+	document.getElementById('game_message').innerHTML += '<p>' + message + '</p>';
+});
+
 socket.on('new_game', function() {
 	document.getElementById('ready').style.display = 'block';
 });

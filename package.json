@@ -13,6 +13,7 @@
     "express": "^4.17.1",
     "ip": "^1.1.5",
     "moment": "^2.26.0",
+    "npm": "^6.14.5",
     "socket.io": "^2.3.0"
   },
   "devDependencies": {
