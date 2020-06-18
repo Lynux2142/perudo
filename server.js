@@ -76,8 +76,12 @@ io.on('connection', function(socket) {
 			socket.broadcast.emit('message', users[playerTurn].username + ' lost');
 			--users[playerTurn].nbDice;
 		} else {
+			socket.emit('message', 'You won')
+			socket.broadcast.emit('message', users[playerTurn].username + ' won')
 			--users[previousPlayerTurn].nbDice;
 		}
+		actualDiceAmount = 0;
+		actualDiceValue = 0;
 		io.emit('update_player', users);
 		nextPlayerTurn();
 		socket.emit('hide_controls');
@@ -98,6 +102,9 @@ function nextRound() {
 function nextPlayerTurn() {
 	previousPlayerTurn = playerTurn;
 	playerTurn = (playerTurn < users.length - 1) ? playerTurn + 1 : 0;
+	while (users[playerTurn].nbDice === 0) {
+		playerTurn = (playerTurn < users.length - 1) ? playerTurn + 1 : 0;
+	}
 }
 
 server.listen(PORT, IP, function() {
