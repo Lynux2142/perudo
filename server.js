@@ -48,8 +48,9 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('bet', function(dice_amount, dice_value) {
-		if (dice_amount < actualDiceAmount || dice_value < actualDiceValue) {
-			socket.emit('message', "You can't do this action");
+		if ((dice_amount < actualDiceAmount || dice_value < actualDiceValue) ||
+		(dice_amount === actualDiceAmount && dice_value === actualDiceValue)) {
+			socket.emit('message', "You cannot do this action");
 		} else {
 			socket.broadcast.emit('message', users[getUser(users, socket.id)].username + " bet there are " + dice_amount + " dice of " + dice_value);
 			actualDiceAmount = dice_amount;
