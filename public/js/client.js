@@ -42,7 +42,7 @@ socket.on('new_round_begin', function() {
 });
 
 socket.on('yourTurn', function() {
-	document.getElementById('buttons').style.display = "block";
+	document.getElementById('buttons').style.display = 'block';
 });
 
 socket.on('hide_controls', function() {
@@ -50,12 +50,17 @@ socket.on('hide_controls', function() {
 });
 
 socket.on('message', function(message) {
-	document.getElementById('game_message').innerHTML = "<p>" + message + "</p>";
+	document.getElementById('game_message').innerHTML = '<p>' + message + '</p>';
+});
+
+socket.on('new_game', function() {
+	document.getElementById('ready').style.display = 'block';
 });
 
 function imReady() {
 	socket.emit('ready');
-	document.getElementById('ready').style.display = "none";
+	document.getElementById('ready').style.display = 'none';
+	document.getElementById('game_message').innerHTML = '';
 }
 
 function bet() {

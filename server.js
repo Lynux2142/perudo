@@ -10,7 +10,7 @@ const io = socketio(server);
 
 const IP = require('ip').address();
 const PORT = 4242 || process.env.PORT;
-const BEGIN_DICE = 5;
+const BEGIN_DICE = 1;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -63,6 +63,8 @@ io.on('connection', function(socket) {
 
 	socket.on('dudo', function() {
 		var realDiceAmount = 0;
+		var winner;
+
 		socket.broadcast.emit('message', users[getUser(users, socket.id)].username + " thinks " + users[previousPlayerTurn].username + " is lying.");
 		for (user in users) {
 			for (dice in users[user].diceList) {
@@ -76,18 +78,25 @@ io.on('connection', function(socket) {
 			socket.emit('message', 'You lost');
 			socket.broadcast.emit('message', users[playerTurn].username + ' lost');
 			--users[playerTurn].nbDice;
+			winner = users[previousPlayerTurn].username;
 		} else {
 			socket.emit('message', 'You won')
 			socket.broadcast.emit('message', users[playerTurn].username + ' won')
 			--users[previousPlayerTurn].nbDice;
+			winner = users[playerTurn].username;
 		}
 		actualDiceAmount = 0;
 		actualDiceValue = 0;
-		io.emit('update_player', users);
-		nextPlayerTurn();
-		socket.emit('hide_controls');
-		io.emit('new_round_begin');
-		nextRound();
+		if (isWin()) {
+			io.emit('message', winner + ' won the game !!');
+			restartGame();
+		} else {
+			io.emit('update_player', users);
+			nextPlayerTurn();
+			socket.emit('hide_controls');
+			io.emit('new_round_begin');
+			nextRound();
+		}
 	});
 
 	socket.on('disconnect', function() {
@@ -106,6 +115,30 @@ function nextPlayerTurn() {
 	while (users[playerTurn].nbDice === 0) {
 		playerTurn = (playerTurn < users.length - 1) ? playerTurn + 1 : 0;
 	}
+}
+
+function isWin() {
+	var playerAlreadyInGame = 0;
+
+	for (user in users) {
+		if (users[user].nbDice !== 0) { ++playerAlreadyInGame; }
+	}
+	return (playerAlreadyInGame !== 1) ? false : true;
+}
+
+function restartGame() {
+	for (user in users) {
+		users[user].nbDice = 0;
+		users[user].diceList = [];
+		users[user].isReady = false;
+	}
+	io.emit('new_game');
+	io.emit('update_player', users);
+	io.emit('hide_controls');
+	for (user in users) {
+		io.to(users[user].id).emit('update_current_player', users[user]);
+	}
+	gameInProgress = false;
 }
 
 server.listen(PORT, IP, function() {
