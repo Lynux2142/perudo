@@ -48,17 +48,23 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('bet', function(dice_amount, dice_value) {
-		if ((dice_amount < actualDiceAmount || dice_value < actualDiceValue) ||
-		(dice_amount === actualDiceAmount && dice_value === actualDiceValue)) {
-			socket.emit('add_message', "You cannot do this action");
-		} else {
-			socket.emit('message', "You bet there are at least " + dice_amount + " dice of " + dice_value);
-			socket.broadcast.emit('message', users[getUser(users, socket.id)].username + " bet there are at least " + dice_amount + " dice of " + dice_value);
+
+		console.log(dice_value + '	' + Math.ceil(actualDiceAmount / 2));
+		if ((dice_value == 1 && dice_amount >= (Math.ceil(actualDiceAmount / 2))) ||
+			((dice_amount >= actualDiceAmount || dice_value >= actualDiceValue) &&
+			!(dice_amount == actualDiceAmount && dice_value == actualDiceValue))) {
+			socket.emit('message', "You bet there are at least " + dice_amount +
+				((dice_value == 1) ? ' PACO' : ' dice of ' + dice_value));
+			socket.broadcast.emit('message', users[getUser(users, socket.id)].username +
+				" bet there are at least " + dice_amount +
+				((dice_value == 1) ? ' PACO' : (' dice of ' + dice_value)));
 			actualDiceAmount = dice_amount;
 			actualDiceValue = dice_value;
 			nextPlayerTurn();
 			socket.emit('hide_controls');
 			nextRound();
+		} else {
+			socket.emit('add_message', "You cannot do this action");
 		}
 	});
 

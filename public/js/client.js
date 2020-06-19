@@ -33,8 +33,12 @@ socket.on('update_player', function(users) {
 });
 
 socket.on('update_current_player', function(current_player) {
-	document.getElementById('dice_set').innerHTML =
-	`<p>${current_player.diceList}</p>`;
+	var dice_list = '<p>';
+	for (i in current_player.diceList) {
+		var dice = current_player.diceList[i];
+		dice_list += ((dice !== 1) ? dice : 'PACO') + ' ';
+	}
+	document.getElementById('dice_set').innerHTML = dice_list + '</p>';
 });
 
 socket.on('new_round_begin', function() {
