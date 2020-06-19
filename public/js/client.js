@@ -22,6 +22,7 @@ socket.on('update_player', function(users, playerTurn) {
 	for (var i = 0; i < users.length; ++i) {
 		const div = document.createElement('div');
 		const selector = (playerTurn == i) ? '=>	' : '';
+		if (users[i].nbDice == 0) { div.style.backgroundColor = 'indianred'; }
 		div.classList.add('player');
 		div.innerHTML = `<div class="player_name">
 				<p>${selector}${users[i].username}</p>
