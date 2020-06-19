@@ -34,6 +34,7 @@ io.on('connection', function(socket) {
 		users[getUser(users, socket.id)].nbDice = gameInProgress ? 0 : BEGIN_DICE;
 		io.emit('update_player', users);
 		if (isAllReady(users) == true) {
+			playerTurn = Math.floor(Math.random() * Math.floor(users.length - 1));
 			gameInProgress = true;
 			io.emit('new_round_begin');
 			nextRound();
@@ -90,6 +91,7 @@ io.on('connection', function(socket) {
 				+ actualDiceValue + '. ' + users[playerTurn].username + ' won')
 			--users[previousPlayerTurn].nbDice;
 			winner = users[playerTurn].username;
+			playerTurn = (users[previousPlayerTurn].nbDice > 0) ? previousPlayerTurn : playerTurn;
 		}
 		if (isWin()) {
 			io.emit('message', 'There are ' + realDiceAmount + ' dice of ' +
@@ -99,7 +101,6 @@ io.on('connection', function(socket) {
 			actualDiceAmount = 0;
 			actualDiceValue = 0;
 			io.emit('update_player', users);
-			nextPlayerTurn();
 			socket.emit('hide_controls');
 			io.emit('new_round_begin');
 			nextRound();
@@ -120,12 +121,14 @@ io.on('connection', function(socket) {
 			socket.broadcast.emit('add_message', 'There are ' + realDiceAmount + ' dice of '
 				+ actualDiceValue + '. ' + users[playerTurn].username + ' won')
 			++users[playerTurn].nbDice;
+			nextPlayerTurn();
 		} else {
 			socket.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
 				actualDiceValue + '. you lost')
 			socket.broadcast.emit('add_message', 'There are ' + realDiceAmount + ' dice of '
 				+ actualDiceValue + '. ' + users[playerTurn].username + ' lost')
 			--users[playerTurn].nbDice;
+			if (users[playerTurn].nbDice == 0) { nextPlayerTurn(); }
 			winner = users[previousPlayerTurn].username;
 		}
 		if (isWin()) {
@@ -136,7 +139,6 @@ io.on('connection', function(socket) {
 			actualDiceAmount = 0;
 			actualDiceValue = 0;
 			io.emit('update_player', users);
-			nextPlayerTurn();
 			socket.emit('hide_controls');
 			io.emit('new_round_begin');
 			nextRound();
