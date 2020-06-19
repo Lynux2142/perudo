@@ -9,7 +9,7 @@ socket.on('connect', function() {
 	socket.emit('add_user', username);
 });
 
-socket.on('update_player', function(users) {
+socket.on('update_player', function(users, playerTurn) {
 	document.getElementById('player_list').innerHTML =
 	`<div class="player_list_title">
 		<div class="player_name">
@@ -21,9 +21,10 @@ socket.on('update_player', function(users) {
 	</div>`;
 	for (var i = 0; i < users.length; ++i) {
 		const div = document.createElement('div');
+		const selector = (playerTurn == i) ? '=>	' : '';
 		div.classList.add('player');
 		div.innerHTML = `<div class="player_name">
-				<p>${users[i].username}</p>
+				<p>${selector}${users[i].username}</p>
 			</div>
 			<div class="dice_list">
 				<p>${users[i].nbDice}</p>

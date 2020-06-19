@@ -26,13 +26,13 @@ io.on('connection', function(socket) {
 
 	socket.on('add_user', function(username) {
 		users.push(new User(socket.id, username, 0, [], false));
-		io.emit('update_player', users);
+		io.emit('update_player', users, playerTurn);
 	});
 
 	socket.on('ready', function() {
 		users[getUser(users, socket.id)].isReady = true;
 		users[getUser(users, socket.id)].nbDice = gameInProgress ? 0 : BEGIN_DICE;
-		io.emit('update_player', users);
+		io.emit('update_player', users, playerTurn);
 		if (isAllReady(users) == true) {
 			playerTurn = Math.floor(Math.random() * Math.floor(users.length));
 			gameInProgress = true;
@@ -103,7 +103,7 @@ io.on('connection', function(socket) {
 		} else {
 			actualDiceAmount = 0;
 			actualDiceValue = 0;
-			io.emit('update_player', users);
+			io.emit('update_player', users, playerTurn);
 			socket.emit('hide_controls');
 			io.emit('new_round_begin');
 			nextRound();
@@ -141,7 +141,7 @@ io.on('connection', function(socket) {
 		} else {
 			actualDiceAmount = 0;
 			actualDiceValue = 0;
-			io.emit('update_player', users);
+			io.emit('update_player', users, playerTurn);
 			socket.emit('hide_controls');
 			io.emit('new_round_begin');
 			nextRound();
@@ -159,7 +159,7 @@ io.on('connection', function(socket) {
 			io.emit('message', username + ' left the game. ' + winner + ' won the game !!');
 			restartGame();
 		}
-		io.emit('update_player', users);
+		io.emit('update_player', users, playerTurn);
 	});
 });
 
@@ -178,6 +178,7 @@ function countDice() {
 }
 
 function nextRound() {
+	io.emit('update_player', users, playerTurn);
 	io.to(users[playerTurn].id).emit('yourTurn');
 }
 
@@ -207,7 +208,7 @@ function restartGame() {
 	actualDiceAmount = 0;
 	actualDiceValue = 0;
 	io.emit('new_game');
-	io.emit('update_player', users);
+	io.emit('update_player', users, playerTurn);
 	io.emit('hide_controls');
 	for (i in users) {
 		io.to(users[i].id).emit('update_current_player', users[i]);
