@@ -81,6 +81,6 @@ function dudo() {
 	socket.emit('dudo');
 }
 
-function palifico() {
-	console.log('palifico');
+function calza() {
+	socket.emit('calza');
 }
