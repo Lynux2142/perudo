@@ -10,7 +10,7 @@ const io = socketio(server);
 
 const IP = require('ip').address();
 const PORT = 4242 || process.env.PORT;
-const BEGIN_DICE = 5;
+const BEGIN_DICE = 1;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -83,6 +83,7 @@ io.on('connection', function(socket) {
 			socket.broadcast.emit('add_message', 'There are ' + realDiceAmount +
 				' dice of ' + actualDiceValue + '. ' + users[playerTurn].username + ' lost');
 			--users[playerTurn].nbDice;
+			if (users[playerTurn].nbDice == 0) { nextPlayerTurn(); }
 			winner = users[previousPlayerTurn].username;
 		} else {
 			socket.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
