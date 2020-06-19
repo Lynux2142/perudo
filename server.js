@@ -10,7 +10,7 @@ const io = socketio(server);
 
 const IP = require('ip').address();
 const PORT = 4242 || process.env.PORT;
-const BEGIN_DICE = 1;
+const BEGIN_DICE = 2;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -34,7 +34,7 @@ io.on('connection', function(socket) {
 		users[getUser(users, socket.id)].nbDice = gameInProgress ? 0 : BEGIN_DICE;
 		io.emit('update_player', users);
 		if (isAllReady(users) == true) {
-			playerTurn = Math.floor(Math.random() * Math.floor(users.length - 1));
+			playerTurn = Math.floor(Math.random() * Math.floor(users.length));
 			gameInProgress = true;
 			io.emit('new_round_begin');
 			nextRound();
@@ -50,9 +50,11 @@ io.on('connection', function(socket) {
 
 	socket.on('bet', function(dice_amount, dice_value) {
 
-		if ((dice_value == 1 && dice_amount >= (Math.ceil(actualDiceAmount / 2))) ||
+		if ((dice_value == 1 && dice_amount >= (Math.ceil(actualDiceAmount / 2)) &&
+			actualDiceValue != 1) ||
 			((dice_amount >= actualDiceAmount || dice_value >= actualDiceValue) &&
-			!(dice_amount == actualDiceAmount && dice_value == actualDiceValue))) {
+			!(dice_amount <= actualDiceAmount && dice_value <= actualDiceValue)) &&
+			((actualDiceValue == 1 && dice_value == 1) || actualDiceValue != 1)) {
 			socket.emit('message', "You bet there are at least " + dice_amount +
 				((dice_value == 1) ? ' PACO' : ' dice of ' + dice_value));
 			socket.broadcast.emit('message', users[getUser(users, socket.id)].username +
@@ -69,31 +71,31 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('dudo', function() {
+		const previousPlayerUsername = users[previousPlayerTurn].username;
+		var result;
 		var realDiceAmount;
 		var winner;
 
-		socket.emit('message', "You thinks " + users[previousPlayerTurn].username +
+		socket.emit('message', "You thinks " + previousPlayerUsername +
 			" is lying.");
 		socket.broadcast.emit('message', users[getUser(users, socket.id)].username +
-			" thinks " + users[previousPlayerTurn].username + " is lying.");
+			" thinks " + previousPlayerUsername + " is lying.");
 		realDiceAmount = countDice();
 		if (actualDiceAmount <= realDiceAmount) {
-			socket.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
-				actualDiceValue + '. You lost');
-			socket.broadcast.emit('add_message', 'There are ' + realDiceAmount +
-				' dice of ' + actualDiceValue + '. ' + users[playerTurn].username + ' lost');
+			result = ' lost';
 			--users[playerTurn].nbDice;
 			if (users[playerTurn].nbDice == 0) { nextPlayerTurn(); }
-			winner = users[previousPlayerTurn].username;
+			winner = previousPlayerUsername;
 		} else {
-			socket.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
-				actualDiceValue + '. you won')
-			socket.broadcast.emit('add_message', 'There are ' + realDiceAmount + ' dice of '
-				+ actualDiceValue + '. ' + users[playerTurn].username + ' won')
+			result = ' won';
 			--users[previousPlayerTurn].nbDice;
 			winner = users[playerTurn].username;
 			playerTurn = (users[previousPlayerTurn].nbDice > 0) ? previousPlayerTurn : playerTurn;
 		}
+		socket.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
+			actualDiceValue + '. You' + result);
+		socket.broadcast.emit('add_message', 'There are ' + realDiceAmount +
+			' dice of ' + actualDiceValue + '. ' + users[playerTurn].username + result);
 		if (isWin()) {
 			io.emit('message', 'There are ' + realDiceAmount + ' dice of ' +
 				actualDiceValue + '. ' + winner + ' won the game !!');
@@ -109,29 +111,29 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('calza', function() {
+		const previousPlayerUsername = users[previousPlayerTurn].username;
+		var result;
 		var realDiceAmount;
 		var winner;
 
-		socket.emit('message', 'You thinks ' + users[previousPlayerTurn].username + "'s bet is right.");
+		socket.emit('message', 'You thinks ' + previousPlayerUsername + "'s bet is right.");
 		socket.broadcast.emit('message', users[getUser(users, socket.id)].username +
-			" thinks " + users[previousPlayerTurn].username + "'s bet is right.");
+			" thinks " + previousPlayerUsername + "'s bet is right.");
 		realDiceAmount = countDice();
 		if (actualDiceAmount == realDiceAmount) {
-			socket.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
-				actualDiceValue + '. you won')
-			socket.broadcast.emit('add_message', 'There are ' + realDiceAmount + ' dice of '
-				+ actualDiceValue + '. ' + users[playerTurn].username + ' won')
+			result = ' won';
 			++users[playerTurn].nbDice;
 			nextPlayerTurn();
 		} else {
-			socket.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
-				actualDiceValue + '. you lost')
-			socket.broadcast.emit('add_message', 'There are ' + realDiceAmount + ' dice of '
-				+ actualDiceValue + '. ' + users[playerTurn].username + ' lost')
+			result = ' lost';
 			--users[playerTurn].nbDice;
 			if (users[playerTurn].nbDice == 0) { nextPlayerTurn(); }
-			winner = users[previousPlayerTurn].username;
+			winner = previousPlayerUsername;
 		}
+		socket.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
+			actualDiceValue + '. you' + result)
+		socket.broadcast.emit('add_message', 'There are ' + realDiceAmount + ' dice of '
+			+ actualDiceValue + '. ' + users[playerTurn].username + result)
 		if (isWin()) {
 			io.emit('message', 'There are ' + realDiceAmount + ' dice of ' +
 				actualDiceValue + '. ' + winner + ' won the game !!');
@@ -147,7 +149,16 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('disconnect', function() {
+		username = users[getUser(users, socket.id)].username;
 		users.splice(getUser(users, socket.id), 1);
+		if (gameInProgress && isWin()) {
+			var winner;
+			for (i in users) {
+				if (users[i].nbDice != 0) { winner = users[i].username }
+			}
+			io.emit('message', username + ' left the game. ' + winner + ' won the game !!');
+			restartGame();
+		}
 		io.emit('update_player', users);
 	});
 });
