@@ -15,8 +15,8 @@ class User {
 }
 
 function isAllReady(users) {
-	for (user in users) {
-		if (users[user].isReady !== true) { return false; }
+	for (i in users) {
+		if (users[i].isReady !== true) { return false; }
 	}
 	return true;
 }

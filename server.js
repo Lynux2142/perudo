@@ -166,9 +166,9 @@ io.on('connection', function(socket) {
 function countDice() {
 	var realDiceAmount = 0;
 
-	for (user in users) {
-		for (dice in users[user].diceList) {
-			var diceValue = users[user].diceList[dice];
+	for (i in users) {
+		for (j in users[i].diceList) {
+			var diceValue = users[i].diceList[j];
 			if (diceValue == actualDiceValue || diceValue == 1) {
 				++realDiceAmount;
 			}
@@ -192,25 +192,25 @@ function nextPlayerTurn() {
 function isWin() {
 	var playerAlreadyInGame = 0;
 
-	for (user in users) {
-		if (users[user].nbDice !== 0) { ++playerAlreadyInGame; }
+	for (i in users) {
+		if (users[i].nbDice !== 0) { ++playerAlreadyInGame; }
 	}
 	return (playerAlreadyInGame !== 1) ? false : true;
 }
 
 function restartGame() {
-	for (user in users) {
-		users[user].nbDice = 0;
-		users[user].diceList = [];
-		users[user].isReady = false;
+	for (i in users) {
+		users[i].nbDice = 0;
+		users[i].diceList = [];
+		users[i].isReady = false;
 	}
 	actualDiceAmount = 0;
 	actualDiceValue = 0;
 	io.emit('new_game');
 	io.emit('update_player', users);
 	io.emit('hide_controls');
-	for (user in users) {
-		io.to(users[user].id).emit('update_current_player', users[user]);
+	for (i in users) {
+		io.to(users[i].id).emit('update_current_player', users[i]);
 	}
 	gameInProgress = false;
 }
