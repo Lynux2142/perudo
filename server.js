@@ -10,7 +10,7 @@ const io = socketio(server);
 
 const IP = require('ip').address();
 const PORT = 4242 || process.env.PORT;
-const BEGIN_DICE = 2;
+const BEGIN_DICE = 5;
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -76,7 +76,7 @@ io.on('connection', function(socket) {
 		var realDiceAmount;
 		var winner;
 
-		socket.emit('message', "You thinks " + previousPlayerUsername +
+		socket.emit('add_message', "You thinks " + previousPlayerUsername +
 			" is lying.");
 		socket.broadcast.emit('message', users[getUser(users, socket.id)].username +
 			" thinks " + previousPlayerUsername + " is lying.");
@@ -93,12 +93,12 @@ io.on('connection', function(socket) {
 			playerTurn = (users[previousPlayerTurn].nbDice > 0) ? previousPlayerTurn : playerTurn;
 		}
 		socket.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
-			actualDiceValue + '. You' + result);
-		socket.broadcast.emit('add_message', 'There are ' + realDiceAmount +
-			' dice of ' + actualDiceValue + '. ' + users[playerTurn].username + result);
+			((actualDiceValue == 1) ? 'PACO' : actualDiceValue) + '. You' + result);
+		socket.broadcast.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
+			((actualDiceValue == 1) ? 'PACO' : actualDiceValue) + '. ' + users[playerTurn].username + result);
 		if (isWin()) {
 			io.emit('message', 'There are ' + realDiceAmount + ' dice of ' +
-				actualDiceValue + '. ' + winner + ' won the game !!');
+				((actualDiceValue == 1) ? 'PACO' : actualDiceValue) + '. ' + winner + ' won the game !!');
 			restartGame();
 		} else {
 			actualDiceAmount = 0;
@@ -116,7 +116,7 @@ io.on('connection', function(socket) {
 		var realDiceAmount;
 		var winner;
 
-		socket.emit('message', 'You thinks ' + previousPlayerUsername + "'s bet is right.");
+		socket.emit('add_message', 'You thinks ' + previousPlayerUsername + "'s bet is right.");
 		socket.broadcast.emit('message', users[getUser(users, socket.id)].username +
 			" thinks " + previousPlayerUsername + "'s bet is right.");
 		realDiceAmount = countDice();
