@@ -80,3 +80,16 @@ button {
 	font-size: 115%;
 	padding: 1%;
 }
+
+@media only screen and (max-width: 1000px) {
+	* {
+		font-size: 115%;
+	}
+	button {
+		font-size: 250%;
+	}
+	label {
+		font-size: 150%;
+	}
+}
+
