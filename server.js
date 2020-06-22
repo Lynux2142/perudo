@@ -50,11 +50,13 @@ io.on('connection', function(socket) {
 
 	socket.on('bet', function(dice_amount, dice_value) {
 
-		if ((dice_value == 1 && dice_amount >= (Math.ceil(actualDiceAmount / 2)) &&
+		if (
+			(dice_value == 1 && dice_amount >= (Math.ceil(actualDiceAmount / 2)) && actualDiceValue != 1) ||
+			(((dice_amount > actualDiceAmount && dice_value > actualDiceValue) ||
+			(dice_amount == actualDiceAmount && dice_value > actualDiceValue) ||
+			(dice_amount > actualDiceAmount && dice_value == actualDiceValue)) &&
 			actualDiceValue != 1) ||
-			((dice_amount >= actualDiceAmount || dice_value >= actualDiceValue) &&
-			!(dice_amount <= actualDiceAmount && dice_value <= actualDiceValue)) &&
-			((actualDiceValue == 1 && dice_value == 1) || actualDiceValue != 1)) {
+			(actualDiceValue == 1 && dice_amount > actualDiceAmount && dice_value == 1)) {
 			socket.emit('message', "You bet there are at least " + dice_amount +
 				((dice_value == 1) ? ' PACO' : ' dice of ' + dice_value));
 			socket.broadcast.emit('message', users[getUser(users, socket.id)].username +
@@ -76,37 +78,41 @@ io.on('connection', function(socket) {
 		var realDiceAmount;
 		var winner;
 
-		socket.emit('add_message', "You thinks " + previousPlayerUsername +
-			" is lying.");
-		socket.broadcast.emit('message', users[getUser(users, socket.id)].username +
-			" thinks " + previousPlayerUsername + " is lying.");
-		realDiceAmount = countDice();
-		if (actualDiceAmount <= realDiceAmount) {
-			result = ' lost';
-			--users[playerTurn].nbDice;
-			if (users[playerTurn].nbDice == 0) { nextPlayerTurn(); }
-			winner = previousPlayerUsername;
+		if (actualDiceValue == 0 || actualDiceAmount == 0) {
+			socket.emit('add_message', "You cannot do this action");
 		} else {
-			result = ' won';
-			--users[previousPlayerTurn].nbDice;
-			winner = users[playerTurn].username;
-			playerTurn = (users[previousPlayerTurn].nbDice > 0) ? previousPlayerTurn : playerTurn;
-		}
-		socket.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
-			((actualDiceValue == 1) ? 'PACO' : actualDiceValue) + '. You' + result);
-		socket.broadcast.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
-			((actualDiceValue == 1) ? 'PACO' : actualDiceValue) + '. ' + users[playerTurn].username + result);
-		if (isWin()) {
-			io.emit('message', 'There are ' + realDiceAmount + ' dice of ' +
-				((actualDiceValue == 1) ? 'PACO' : actualDiceValue) + '. ' + winner + ' won the game !!');
-			restartGame();
-		} else {
-			actualDiceAmount = 0;
-			actualDiceValue = 0;
-			io.emit('update_player', users, playerTurn);
-			socket.emit('hide_controls');
-			io.emit('new_round_begin');
-			nextRound();
+			socket.emit('add_message', "You thinks " + previousPlayerUsername +
+				" is lying.");
+			socket.broadcast.emit('message', users[getUser(users, socket.id)].username +
+				" thinks " + previousPlayerUsername + " is lying.");
+			realDiceAmount = countDice();
+			if (actualDiceAmount <= realDiceAmount) {
+				result = ' lost';
+				--users[playerTurn].nbDice;
+				if (users[playerTurn].nbDice == 0) { nextPlayerTurn(); }
+				winner = previousPlayerUsername;
+			} else {
+				result = ' won';
+				--users[previousPlayerTurn].nbDice;
+				winner = users[playerTurn].username;
+				playerTurn = (users[previousPlayerTurn].nbDice > 0) ? previousPlayerTurn : playerTurn;
+			}
+			socket.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
+				((actualDiceValue == 1) ? 'PACO' : actualDiceValue) + '. You' + result);
+			socket.broadcast.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
+				((actualDiceValue == 1) ? 'PACO' : actualDiceValue) + '. ' + users[playerTurn].username + result);
+			if (isWin()) {
+				io.emit('message', 'There are ' + realDiceAmount + ' dice of ' +
+					((actualDiceValue == 1) ? 'PACO' : actualDiceValue) + '. ' + winner + ' won the game !!');
+				restartGame();
+			} else {
+				actualDiceAmount = 0;
+				actualDiceValue = 0;
+				io.emit('update_player', users, playerTurn);
+				socket.emit('hide_controls');
+				io.emit('new_round_begin');
+				nextRound();
+			}
 		}
 	});
 
@@ -116,35 +122,39 @@ io.on('connection', function(socket) {
 		var realDiceAmount;
 		var winner;
 
-		socket.emit('add_message', 'You thinks ' + previousPlayerUsername + "'s bet is right.");
-		socket.broadcast.emit('message', users[getUser(users, socket.id)].username +
-			" thinks " + previousPlayerUsername + "'s bet is right.");
-		realDiceAmount = countDice();
-		if (actualDiceAmount == realDiceAmount) {
-			result = ' won';
-			++users[playerTurn].nbDice;
-			nextPlayerTurn();
+		if (actualDiceAmount == 0 || actualDiceValue == 0) {
+			socket.emit('add_message', "You cannot do this action");
 		} else {
-			result = ' lost';
-			--users[playerTurn].nbDice;
-			if (users[playerTurn].nbDice == 0) { nextPlayerTurn(); }
-			winner = previousPlayerUsername;
-		}
-		socket.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
-			actualDiceValue + '. you' + result)
-		socket.broadcast.emit('add_message', 'There are ' + realDiceAmount + ' dice of '
-			+ actualDiceValue + '. ' + users[playerTurn].username + result)
-		if (isWin()) {
-			io.emit('message', 'There are ' + realDiceAmount + ' dice of ' +
-				actualDiceValue + '. ' + winner + ' won the game !!');
-			restartGame();
-		} else {
-			actualDiceAmount = 0;
-			actualDiceValue = 0;
-			io.emit('update_player', users, playerTurn);
-			socket.emit('hide_controls');
-			io.emit('new_round_begin');
-			nextRound();
+			socket.emit('add_message', 'You thinks ' + previousPlayerUsername + "'s bet is right.");
+			socket.broadcast.emit('message', users[getUser(users, socket.id)].username +
+				" thinks " + previousPlayerUsername + "'s bet is right.");
+			realDiceAmount = countDice();
+			if (actualDiceAmount == realDiceAmount) {
+				result = ' won';
+				++users[playerTurn].nbDice;
+				nextPlayerTurn();
+			} else {
+				result = ' lost';
+				--users[playerTurn].nbDice;
+				if (users[playerTurn].nbDice == 0) { nextPlayerTurn(); }
+				winner = previousPlayerUsername;
+			}
+			socket.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
+				actualDiceValue + '. you' + result)
+			socket.broadcast.emit('add_message', 'There are ' + realDiceAmount + ' dice of '
+				+ actualDiceValue + '. ' + users[playerTurn].username + result)
+			if (isWin()) {
+				io.emit('message', 'There are ' + realDiceAmount + ' dice of ' +
+					actualDiceValue + '. ' + winner + ' won the game !!');
+				restartGame();
+			} else {
+				actualDiceAmount = 0;
+				actualDiceValue = 0;
+				io.emit('update_player', users, playerTurn);
+				socket.emit('hide_controls');
+				io.emit('new_round_begin');
+				nextRound();
+			}
 		}
 	});
 
