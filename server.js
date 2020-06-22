@@ -39,15 +39,15 @@ io.on('connection', function(socket) {
 			if (isAllReady(users) == true) {
 				playerTurn = Math.floor(Math.random() * Math.floor(users.length));
 				gameInProgress = true;
-				io.emit('new_round_begin');
+				io.emit('new_round_begin', '2142');
 				nextRound();
 			}
 		}
 	});
 
-	socket.on('roll_dice', function() {
+	socket.on('roll_dice', function(password) {
 		const user = getUser(users, socket.id);
-		if (user != null) {
+		if (user != null && actualDiceAmount == 0 && actualDiceValue == 0 && password === '2142') {
 			if (users[user].nbDice !== 0) {
 				users[user].giveDice();
 			}
@@ -57,7 +57,7 @@ io.on('connection', function(socket) {
 
 	socket.on('bet', function(dice_amount, dice_value) {
 		const user = getUser(users, socket.id);
-		if (user != null) {
+		if (user != null && user == playerTurn) {
 			if ((dice_value == 1 && dice_amount >= (Math.ceil(actualDiceAmount / 2)) && actualDiceValue != 1) ||
 				(((dice_amount > actualDiceAmount && dice_value > actualDiceValue) ||
 				(dice_amount == actualDiceAmount && dice_value > actualDiceValue) ||
@@ -87,7 +87,7 @@ io.on('connection', function(socket) {
 		var realDiceAmount;
 		var winner;
 
-		if (user != null) {
+		if (user != null && user == playerTurn) {
 			if (actualDiceValue == 0 || actualDiceAmount == 0) {
 				socket.emit('add_message', "You cannot do this action");
 			} else {
@@ -120,7 +120,7 @@ io.on('connection', function(socket) {
 					actualDiceValue = 0;
 					io.emit('update_player', users, playerTurn);
 					socket.emit('hide_controls');
-					io.emit('new_round_begin');
+					io.emit('new_round_begin', '2142');
 					nextRound();
 				}
 			}
@@ -134,7 +134,7 @@ io.on('connection', function(socket) {
 		var realDiceAmount;
 		var winner;
 
-		if (user != null) {
+		if (user != null && user == playerTurn) {
 			if (actualDiceAmount == 0 || actualDiceValue == 0) {
 				socket.emit('add_message', "You cannot do this action");
 			} else {
@@ -165,7 +165,7 @@ io.on('connection', function(socket) {
 					actualDiceValue = 0;
 					io.emit('update_player', users, playerTurn);
 					socket.emit('hide_controls');
-					io.emit('new_round_begin');
+					io.emit('new_round_begin', '2142');
 					nextRound();
 				}
 			}

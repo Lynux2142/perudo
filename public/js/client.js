@@ -48,8 +48,8 @@ socket.on('update_current_player', function(current_player) {
 	document.getElementById('dice_set').innerHTML = dice_list + '</p>';
 });
 
-socket.on('new_round_begin', function() {
-	socket.emit('roll_dice');
+socket.on('new_round_begin', function(password) {
+	socket.emit('roll_dice', password);
 });
 
 socket.on('yourTurn', function() {
