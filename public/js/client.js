@@ -7,7 +7,6 @@ socket.on('connect', function() {
 	const username = urlParams.get('username');
 	const regex = RegExp('[A-Za-z0-9]*');
 	const match = username.match(regex);
-	console.log(match);
 
 	if (match != '') {
 		socket.emit('add_user', match);

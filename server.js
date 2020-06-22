@@ -47,6 +47,7 @@ io.on('connection', function(socket) {
 
 	socket.on('roll_dice', function(password) {
 		const user = getUser(users, socket.id);
+
 		if (user != null && actualDiceAmount == 0 && actualDiceValue == 0 && password === '2142') {
 			if (users[user].nbDice !== 0) {
 				users[user].giveDice();
@@ -57,6 +58,7 @@ io.on('connection', function(socket) {
 
 	socket.on('bet', function(dice_amount, dice_value) {
 		const user = getUser(users, socket.id);
+
 		if (user != null && user == playerTurn) {
 			if ((dice_value == 1 && dice_amount >= (Math.ceil(actualDiceAmount / 2)) && actualDiceValue != 1) ||
 				(((dice_amount > actualDiceAmount && dice_value > actualDiceValue) ||
@@ -173,6 +175,7 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('disconnect', function() {
+
 		const user = getUser(users, socket.id);
 		if (user != null) {
 			username = users[user].username;
