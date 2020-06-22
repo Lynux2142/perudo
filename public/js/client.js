@@ -3,10 +3,15 @@ const playerForm = document.getElementById('player_list');
 
 const urlParams = new URLSearchParams(window.location.search);
 
-username = urlParams.get('username');
-
 socket.on('connect', function() {
-	socket.emit('add_user', username);
+	const username = urlParams.get('username');
+	const regex = RegExp('[A-Za-z0-9]*');
+	const match = username.match(regex);
+	console.log(match);
+
+	if (match != '') {
+		socket.emit('add_user', match);
+	}
 });
 
 socket.on('update_player', function(users, playerTurn) {
