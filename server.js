@@ -8,8 +8,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
-const IP = require('ip').address();
-const PORT = 4242 || process.env.PORT;
+const PORT = 5000 || process.env.PORT;
 const BEGIN_DICE = 5;
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -247,5 +246,5 @@ function restartGame() {
 }
 
 server.listen(PORT, function() {
-	console.log(`Server is listening on ${IP}:${PORT}`);
+	console.log(`Server is listening`);
 });
