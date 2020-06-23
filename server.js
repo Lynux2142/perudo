@@ -246,6 +246,6 @@ function restartGame() {
 	gameInProgress = false;
 }
 
-server.listen(PORT, IP, function() {
+server.listen(PORT, function() {
 	console.log(`Server is listening on ${IP}:${PORT}`);
 });
