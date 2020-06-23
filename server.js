@@ -179,6 +179,7 @@ io.on('connection', function(socket) {
 		if (user != null) {
 			username = users[user].username;
 			users.splice(user, 1);
+			delete usersNameList[username];
 			if (gameInProgress && isWin()) {
 				var winner;
 				for (i in users) {
