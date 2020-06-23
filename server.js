@@ -8,6 +8,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
+const IP = require('ip').address();
 const PORT = process.env.PORT || 4242;
 const BEGIN_DICE = 5;
 
@@ -246,6 +247,6 @@ function restartGame() {
 	gameInProgress = false;
 }
 
-server.listen(PORT, function() {
+server.listen(PORT, IP, function() {
 	console.log(`Server is listening`);
 });
