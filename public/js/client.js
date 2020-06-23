@@ -78,8 +78,8 @@ function imReady() {
 }
 
 function bet() {
-	const dice_amount = document.getElementById('diceAmount').value;
-	const dice_value = document.getElementById('diceValue').value;
+	const dice_amount = parseInt(document.getElementById('diceAmount').value, 10);
+	const dice_value = parseInt(document.getElementById('diceValue').value, 10);
 	socket.emit('bet', dice_amount, dice_value);
 }
 
