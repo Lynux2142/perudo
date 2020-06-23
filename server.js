@@ -15,6 +15,7 @@ const BEGIN_DICE = 5;
 app.use(express.static(path.join(__dirname, 'public')));
 
 var users = [];
+var usersNameList = {};
 var gameInProgress = false;
 var playerTurn = 0;
 var previousPlayerTurn = 0;
@@ -25,8 +26,11 @@ io.on('connection', function(socket) {
 	console.log('New connection')
 
 	socket.on('add_user', function(username) {
-		users.push(new User(socket.id, username, 0, [], false));
-		io.emit('update_player', users, playerTurn);
+		if (!usersNameList[username]) {
+			users.push(new User(socket.id, username, 0, [], false));
+			usersNameList[username] = username;
+			io.emit('update_player', users, playerTurn);
+		}
 	});
 
 	socket.on('ready', function() {
