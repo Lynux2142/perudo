@@ -98,7 +98,7 @@ io.on('connection', function(socket) {
 			} else {
 				socket.emit('add_message', "You thinks " + previousPlayerUsername +
 					" is lying.");
-				socket.broadcast.emit('message', users[user].username +
+				socket.broadcast.emit('add_message', users[user].username +
 					" thinks " + previousPlayerUsername + " is lying.");
 				realDiceAmount = countDice();
 				if (actualDiceAmount <= realDiceAmount) {
