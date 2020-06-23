@@ -157,10 +157,10 @@ io.on('connection', function(socket) {
 				socket.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
 					actualDiceValue + '. you' + result)
 				socket.broadcast.emit('add_message', 'There are ' + realDiceAmount + ' dice of '
-					+ actualDiceValue + '. ' + playerUsername + result)
+					+ ((actualDiceValue == 1) ? 'PACO' : actualDiceValue) + '. ' + playerUsername + result)
 				if (isWin()) {
 					io.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
-						actualDiceValue + '. ' + playerUsername + ' won the game !!');
+						((actualDiceValue == 1) ? 'PACO' : actualDiceValue) + '. ' + playerUsername + ' won the game !!');
 					restartGame();
 				} else {
 					actualDiceAmount = 0;
