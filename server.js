@@ -142,7 +142,7 @@ io.on('connection', function(socket) {
 				socket.emit('add_message', "You cannot do this action");
 			} else {
 				socket.emit('add_message', 'You thinks ' + previousPlayerUsername + "'s bet is right.");
-				socket.broadcast.emit('message', users[user].username +
+				socket.broadcast.emit('add_message', users[user].username +
 					" thinks " + previousPlayerUsername + "'s bet is right.");
 				realDiceAmount = countDice();
 				if (actualDiceAmount == realDiceAmount) {
