@@ -8,7 +8,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
-const PORT = 5000 || process.env.PORT;
+const PORT = process.env.PORT || 5000;
 const BEGIN_DICE = 5;
 
 app.use(express.static(path.join(__dirname, 'public')));
