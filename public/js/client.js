@@ -5,11 +5,13 @@ const urlParams = new URLSearchParams(window.location.search);
 
 socket.on('connect', function() {
 	const username = urlParams.get('username');
-	const regex = RegExp('[A-Za-z0-9]*');
-	const match = username.match(regex);
+	const regex = RegExp('[A-Za-z0-9]+');
+	const userMatch = username.match(regex);
+	const room = urlParams.get('room');
+	const roomMatch = room.match(regex);
 
-	if (match != '') {
-		socket.emit('add_user', match);
+	if (userMatch && roomMatch) {
+		socket.emit('add_user', userMatch, roomMatch);
 	}
 });
 

@@ -15,7 +15,7 @@ const BEGIN_DICE = 5;
 app.use(express.static(path.join(__dirname, 'public')));
 
 var users = [];
-var rooms = { default: {} };
+var rooms = { 'default': [] };
 var usersNameList = {};
 var gameInProgress = false;
 var playerTurn = 0;
@@ -26,7 +26,7 @@ var actualDiceValue = 0;
 io.on('connection', function(socket) {
 	console.log('New connection')
 
-	socket.on('add_user', function(username) {
+	socket.on('add_user', function(username, room) {
 		if (!usersNameList[username]) {
 			users.push(new User(socket.id, username, 0, [], false));
 			usersNameList[username] = username;
