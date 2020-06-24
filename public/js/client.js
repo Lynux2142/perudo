@@ -23,27 +23,26 @@ socket.on('update_player', function(users, playerTurn) {
 			<p>Dice</p>
 		</div>
 	</div>`;
-	for (var i = 0; i < users.length; ++i) {
+	users.forEach(user => {
 		const div = document.createElement('div');
 		const selector = (playerTurn == i) ? '=>	' : '';
-		if (users[i].nbDice == 0) { div.style.backgroundColor = 'indianred'; }
+		if (user.nbDice == 0) { div.style.backgroundColor = 'indianred'; }
 		div.classList.add('player');
 		div.innerHTML = `<div class="player_name">
-				<p>${selector}${users[i].username}</p>
+				<p>${selector}${user.username}</p>
 			</div>
 			<div class="dice_list">
-				<p>${users[i].nbDice}</p>
+				<p>${user.nbDice}</p>
 			</div>`;
 		document.getElementById('player_list').appendChild(div);
-	}
+	});
 });
 
 socket.on('update_current_player', function(current_player) {
 	var dice_list = '<p>';
-	for (i in current_player.diceList) {
-		var dice = current_player.diceList[i];
-		dice_list += ((dice !== 1) ? dice : 'PACO') + ' ';
-	}
+	current_player.diceList.forEach(diceValue => {
+		dice_list += ((diceValue !== 1) ? diceValue : 'PACO') + ' ';
+	});
 	document.getElementById('dice_set').innerHTML = dice_list + '</p>';
 });
 

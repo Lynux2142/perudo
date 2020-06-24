@@ -15,10 +15,8 @@ class User {
 }
 
 function isAllReady(users) {
-	for (i in users) {
-		if (users[i].isReady !== true) { return false; }
-	}
-	return true;
+	const result = users.find(user => user.isReady === false);
+	return (result) ? false : true;
 }
 
 function rollDice() {
@@ -26,9 +24,7 @@ function rollDice() {
 }
 
 function getUser(users, id) {
-	for (var i = 0; i < users.length; ++i)
-		if (users[i].id === id) { return i; }
-	return null;
+	return users.find(user => user.id === id);
 }
 
 module.exports = { User, isAllReady, getUser }

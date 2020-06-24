@@ -15,6 +15,7 @@ const BEGIN_DICE = 5;
 app.use(express.static(path.join(__dirname, 'public')));
 
 var users = [];
+var rooms = { default: {} };
 var usersNameList = {};
 var gameInProgress = false;
 var playerTurn = 0;
@@ -37,10 +38,10 @@ io.on('connection', function(socket) {
 		const user = getUser(users, socket.id);
 
 		if (user != null) {
-			users[user].isReady = true;
-			users[user].nbDice = gameInProgress ? 0 : BEGIN_DICE;
+			user.isReady = true;
+			user.nbDice = gameInProgress ? 0 : BEGIN_DICE;
 			io.emit('update_player', users, playerTurn);
-			if (isAllReady(users) == true) {
+			if (isAllReady(users) === true) {
 				playerTurn = Math.floor(Math.random() * Math.floor(users.length));
 				gameInProgress = true;
 				io.emit('new_round_begin', '2142');
@@ -52,29 +53,29 @@ io.on('connection', function(socket) {
 	socket.on('roll_dice', function(password) {
 		const user = getUser(users, socket.id);
 
-		if (user != null && actualDiceAmount == 0 && actualDiceValue == 0 && password === '2142') {
-			if (users[user].nbDice !== 0) {
-				users[user].giveDice();
+		if (user != null && actualDiceAmount === 0 && actualDiceValue === 0 && password === '2142') {
+			if (user.nbDice !== 0) {
+				user.giveDice();
 			}
-			socket.emit('update_current_player', users[user]);
+			socket.emit('update_current_player', user);
 		}
 	});
 
 	socket.on('bet', function(dice_amount, dice_value) {
 		const user = getUser(users, socket.id);
 
-		if (user != null && user == playerTurn) {
-			if ((dice_value == 1 && dice_amount >= (Math.ceil(actualDiceAmount / 2)) && actualDiceValue != 1) ||
+		if (user != null && user === users[playerTurn]) {
+			if ((dice_value === 1 && dice_amount >= (Math.ceil(actualDiceAmount / 2)) && actualDiceValue != 1) ||
 				(((dice_amount > actualDiceAmount && dice_value > actualDiceValue) ||
-				(dice_amount == actualDiceAmount && dice_value > actualDiceValue) ||
-				(dice_amount > actualDiceAmount && dice_value == actualDiceValue)) &&
+				(dice_amount === actualDiceAmount && dice_value > actualDiceValue) ||
+				(dice_amount > actualDiceAmount && dice_value === actualDiceValue)) &&
 				actualDiceValue != 1) ||
-				(actualDiceValue == 1 && dice_amount > actualDiceAmount && dice_value == 1)) {
+				(actualDiceValue === 1 && dice_amount > actualDiceAmount && dice_value === 1)) {
 				socket.emit('message', "You bet there are at least " + dice_amount +
-					((dice_value == 1) ? ' PACO' : ' dice of ' + dice_value));
-				socket.broadcast.emit('message', users[user].username +
+					((dice_value === 1) ? ' PACO' : ' dice of ' + dice_value));
+				socket.broadcast.emit('message', user.username +
 					" bet there are at least " + dice_amount +
-					((dice_value == 1) ? ' PACO' : (' dice of ' + dice_value)));
+					((dice_value === 1) ? ' PACO' : (' dice of ' + dice_value)));
 				actualDiceAmount = dice_amount;
 				actualDiceValue = dice_value;
 				nextPlayerTurn();
@@ -92,31 +93,32 @@ io.on('connection', function(socket) {
 		const playerUsername = users[playerTurn].username;
 		var result;
 		var realDiceAmount;
-		if (user != null && user == playerTurn) {
-			if (actualDiceValue == 0 || actualDiceAmount == 0) {
+
+		if (user != null && user === users[playerTurn]) {
+			if (actualDiceValue === 0 || actualDiceAmount === 0) {
 				socket.emit('add_message', "You cannot do this action");
 			} else {
 				socket.emit('add_message', "You thinks " + previousPlayerUsername +
 					" is lying.");
-				socket.broadcast.emit('add_message', users[user].username +
+				socket.broadcast.emit('add_message', user.username +
 					" thinks " + previousPlayerUsername + " is lying.");
 				realDiceAmount = countDice();
 				if (actualDiceAmount <= realDiceAmount) {
 					result = ' lost';
 					--users[playerTurn].nbDice;
-					if (users[playerTurn].nbDice == 0) { nextPlayerTurn(); }
+					if (users[playerTurn].nbDice === 0) { nextPlayerTurn(); }
 				} else {
 					result = ' won';
 					--users[previousPlayerTurn].nbDice;
 					playerTurn = (users[previousPlayerTurn].nbDice > 0) ? previousPlayerTurn : playerTurn;
 				}
 				socket.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
-					((actualDiceValue == 1) ? 'PACO' : actualDiceValue) + '. You' + result);
+					((actualDiceValue === 1) ? 'PACO' : actualDiceValue) + '. You' + result);
 				socket.broadcast.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
-					((actualDiceValue == 1) ? 'PACO' : actualDiceValue) + '. ' + playerUsername + result);
+					((actualDiceValue === 1) ? 'PACO' : actualDiceValue) + '. ' + playerUsername + result);
 				if (isWin()) {
 					io.emit('message', 'There are ' + realDiceAmount + ' dice of ' +
-						((actualDiceValue == 1) ? 'PACO' : actualDiceValue) + '. ' + playerUsername + ' won the game !!');
+						((actualDiceValue === 1) ? 'PACO' : actualDiceValue) + '. ' + playerUsername + ' won the game !!');
 					restartGame();
 				} else {
 					actualDiceAmount = 0;
@@ -137,30 +139,30 @@ io.on('connection', function(socket) {
 		var result;
 		var realDiceAmount;
 
-		if (user != null && user == playerTurn) {
-			if (actualDiceAmount == 0 || actualDiceValue == 0) {
+		if (user != null && user === users[playerTurn]) {
+			if (actualDiceAmount === 0 || actualDiceValue === 0) {
 				socket.emit('add_message', "You cannot do this action");
 			} else {
 				socket.emit('add_message', 'You thinks ' + previousPlayerUsername + "'s bet is right.");
-				socket.broadcast.emit('add_message', users[user].username +
+				socket.broadcast.emit('add_message', user.username +
 					" thinks " + previousPlayerUsername + "'s bet is right.");
 				realDiceAmount = countDice();
-				if (actualDiceAmount == realDiceAmount) {
+				if (actualDiceAmount === realDiceAmount) {
 					result = ' won';
 					++users[playerTurn].nbDice;
 					nextPlayerTurn();
 				} else {
 					result = ' lost';
 					--users[playerTurn].nbDice;
-					if (users[playerTurn].nbDice == 0) { nextPlayerTurn(); }
+					if (users[playerTurn].nbDice === 0) { nextPlayerTurn(); }
 				}
 				socket.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
 					actualDiceValue + '. you' + result)
 				socket.broadcast.emit('add_message', 'There are ' + realDiceAmount + ' dice of '
-					+ ((actualDiceValue == 1) ? 'PACO' : actualDiceValue) + '. ' + playerUsername + result)
+					+ ((actualDiceValue === 1) ? 'PACO' : actualDiceValue) + '. ' + playerUsername + result)
 				if (isWin()) {
 					io.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
-						((actualDiceValue == 1) ? 'PACO' : actualDiceValue) + '. ' + playerUsername + ' won the game !!');
+						((actualDiceValue === 1) ? 'PACO' : actualDiceValue) + '. ' + playerUsername + ' won the game !!');
 					restartGame();
 				} else {
 					actualDiceAmount = 0;
@@ -175,17 +177,17 @@ io.on('connection', function(socket) {
 	});
 
 	socket.on('disconnect', function() {
-
 		const user = getUser(users, socket.id);
+
 		if (user != null) {
-			username = users[user].username;
-			users.splice(user, 1);
+			username = user.username;
+			users.splice(users.indexOf(user), 1);
 			delete usersNameList[username];
 			if (gameInProgress && isWin()) {
 				var winner;
-				for (i in users) {
-					if (users[i].nbDice != 0) { winner = users[i].username }
-				}
+				users.forEach(user => {
+					if (user.nbDice != 0) { winner = user.username }
+				});
 				io.emit('message', username + ' left the game. ' + winner + ' won the game !!');
 				restartGame();
 			}
@@ -197,14 +199,13 @@ io.on('connection', function(socket) {
 function countDice() {
 	var realDiceAmount = 0;
 
-	for (i in users) {
-		for (j in users[i].diceList) {
-			var diceValue = users[i].diceList[j];
-			if (diceValue == actualDiceValue || diceValue == 1) {
+	users.forEach(user => {
+		user.diceList.forEach(diceValue => {
+			if (diceValue === actualDiceValue || diceValue === 1) {
 				++realDiceAmount;
 			}
-		}
-	}
+		});
+	});
 	return realDiceAmount;
 }
 
@@ -224,26 +225,26 @@ function nextPlayerTurn() {
 function isWin() {
 	var playerAlreadyInGame = 0;
 
-	for (i in users) {
-		if (users[i].nbDice !== 0) { ++playerAlreadyInGame; }
-	}
+	users.forEach(user => {
+		if (user.nbDice !== 0) { ++playerAlreadyInGame; }
+	});
 	return (playerAlreadyInGame !== 1) ? false : true;
 }
 
 function restartGame() {
-	for (i in users) {
-		users[i].nbDice = 0;
-		users[i].diceList = [];
-		users[i].isReady = false;
-	}
+	users.forEach(user => {
+		user.nbDice = 0;
+		user.diceList = [];
+		user.isReady = false;
+	});
 	actualDiceAmount = 0;
 	actualDiceValue = 0;
 	io.emit('new_game');
 	io.emit('update_player', users, playerTurn);
 	io.emit('hide_controls');
-	for (i in users) {
-		io.to(users[i].id).emit('update_current_player', users[i]);
-	}
+	users.forEach(user => {
+		io.to(user.id).emit('update_current_player', user);
+	});
 	gameInProgress = false;
 }
 
