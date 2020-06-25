@@ -15,7 +15,6 @@ const BEGIN_DICE = 5;
 app.use(express.static(path.join(__dirname, 'public')));
 
 var users = [];
-var rooms = { 'Default': [] };
 var usersNameList = {};
 var gameInProgress = false;
 var playerTurn = 0;
@@ -26,7 +25,7 @@ var actualDiceValue = 0;
 io.on('connection', function(socket) {
 	console.log('New connection')
 
-	socket.on('add_user', function(username, room) {
+	socket.on('add_user', function(username) {
 		if (!usersNameList[username]) {
 			users.push(new User(socket.id, username, 0, [], false));
 			usersNameList[username] = username;
@@ -91,6 +90,7 @@ io.on('connection', function(socket) {
 		const user = getUser(users, socket.id);
 		const previousPlayerUsername = users[previousPlayerTurn].username;
 		const playerUsername = users[playerTurn].username;
+		var winner;
 		var result;
 		var realDiceAmount;
 
@@ -106,10 +106,12 @@ io.on('connection', function(socket) {
 				if (actualDiceAmount <= realDiceAmount) {
 					result = ' lost';
 					--users[playerTurn].nbDice;
+					winner = previousPlayerUsername;
 					if (users[playerTurn].nbDice === 0) { nextPlayerTurn(); }
 				} else {
 					result = ' won';
 					--users[previousPlayerTurn].nbDice;
+					winner = playerUsername;
 					playerTurn = (users[previousPlayerTurn].nbDice > 0) ? previousPlayerTurn : playerTurn;
 				}
 				socket.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
@@ -117,8 +119,7 @@ io.on('connection', function(socket) {
 				socket.broadcast.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
 					((actualDiceValue === 1) ? 'PACO' : actualDiceValue) + '. ' + playerUsername + result);
 				if (isWin()) {
-					io.emit('message', 'There are ' + realDiceAmount + ' dice of ' +
-						((actualDiceValue === 1) ? 'PACO' : actualDiceValue) + '. ' + playerUsername + ' won the game !!');
+					io.emit('add_message', winner + ' won the game !!');
 					restartGame();
 				} else {
 					actualDiceAmount = 0;
@@ -136,6 +137,7 @@ io.on('connection', function(socket) {
 		const user = getUser(users, socket.id);
 		const previousPlayerUsername = users[previousPlayerTurn].username;
 		const playerUsername = users[playerTurn].username;
+		var winner;
 		var result;
 		var realDiceAmount;
 
@@ -150,10 +152,12 @@ io.on('connection', function(socket) {
 				if (actualDiceAmount === realDiceAmount) {
 					result = ' won';
 					++users[playerTurn].nbDice;
+					winner = playerUsername;
 					nextPlayerTurn();
 				} else {
 					result = ' lost';
 					--users[playerTurn].nbDice;
+					winner = previousPlayerUsername;
 					if (users[playerTurn].nbDice === 0) { nextPlayerTurn(); }
 				}
 				socket.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
@@ -161,8 +165,7 @@ io.on('connection', function(socket) {
 				socket.broadcast.emit('add_message', 'There are ' + realDiceAmount + ' dice of '
 					+ ((actualDiceValue === 1) ? 'PACO' : actualDiceValue) + '. ' + playerUsername + result)
 				if (isWin()) {
-					io.emit('add_message', 'There are ' + realDiceAmount + ' dice of ' +
-						((actualDiceValue === 1) ? 'PACO' : actualDiceValue) + '. ' + playerUsername + ' won the game !!');
+					io.emit('add_message', winner + ' won the game !!');
 					restartGame();
 				} else {
 					actualDiceAmount = 0;

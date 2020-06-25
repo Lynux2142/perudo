@@ -1,17 +1,13 @@
 const socket = io();
-const playerForm = document.getElementById('player_list');
-
 const urlParams = new URLSearchParams(window.location.search);
 
 socket.on('connect', function() {
 	const username = urlParams.get('username');
 	const regex = RegExp('[A-Za-z0-9]+');
 	const userMatch = username.match(regex);
-	const room = urlParams.get('room');
-	const roomMatch = room.match(regex);
 
-	if (userMatch && roomMatch) {
-		socket.emit('add_user', userMatch, roomMatch);
+	if (userMatch) {
+		socket.emit('add_user', userMatch);
 	}
 });
 
