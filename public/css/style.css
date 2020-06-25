@@ -77,8 +77,16 @@
 }
 
 button {
+	color: black;
 	font-size: 115%;
 	padding: 1%;
+	border-radius: 4px;
+	transition-duration: 0.3s;
+}
+
+button:hover {
+	background-color: grey;
+	color: white;
 }
 
 @media only screen and (max-width: 1000px) {
