@@ -99,9 +99,13 @@ button:hover {
 	}
 	button {
 		font-size: 250%;
+		border-radius: 20px;
 	}
 	label {
 		font-size: 150%;
+	}
+	div {
+		border-radius: 20px;
 	}
 }
 
