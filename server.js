@@ -15,7 +15,7 @@ const BEGIN_DICE = 5;
 app.use(express.static(path.join(__dirname, 'public')));
 
 var users = [];
-var rooms = { 'default': [] };
+var rooms = { 'Default': [] };
 var usersNameList = {};
 var gameInProgress = false;
 var playerTurn = 0;
