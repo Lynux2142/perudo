@@ -23,10 +23,10 @@ var actualDiceAmount = 0;
 var actualDiceValue = 0;
 
 io.on('connection', function(socket) {
-	console.log('New connection')
 
 	socket.on('add_user', function(username) {
 		if (!usersNameList[username]) {
+			console.log(username + ' has connected')
 			users.push(new User(socket.id, username, 0, [], false));
 			usersNameList[username] = username;
 			io.emit('update_player', users, playerTurn);
@@ -53,9 +53,7 @@ io.on('connection', function(socket) {
 		const user = getUser(users, socket.id);
 
 		if (user != null && actualDiceAmount === 0 && actualDiceValue === 0 && password === '2142') {
-			if (user.nbDice !== 0) {
-				user.giveDice();
-			}
+			if (user.nbDice !== 0) { user.giveDice(); }
 			socket.emit('update_current_player', user);
 		}
 	});
@@ -184,6 +182,7 @@ io.on('connection', function(socket) {
 
 		if (user != null) {
 			username = user.username;
+			console.log(username + ' has disconnected')
 			users.splice(users.indexOf(user), 1);
 			delete usersNameList[username];
 			if (gameInProgress && isWin()) {
